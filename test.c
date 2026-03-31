@@ -8,5 +8,3 @@ int main() {
     printf("Bonjour ceci est un test commencons le projet ") ;
     return 0;
 }
-
-
