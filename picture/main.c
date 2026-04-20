@@ -55,20 +55,22 @@ int main()
 {
     initialisation_allegro();
     //allegro_init();
-    int x,y;
+    //int x,y;
 
-    //BITMAP *decor = load_bitmap("../images/arbre2.bmp", NULL);
-    BITMAP *decor = load_bitmap("../images/arbre4.bmp", NULL);
+    BITMAP *decor = load_bitmap("../images/decor-1280x1024-32.bmp", NULL);
     if (!decor) {
         allegro_message("%s", allegro_error);
+        allegro_message("toto");
         exit(EXIT_FAILURE);
+        return 0;
     }
 
 
-
-    blit(decor,screen,0,0, (SCREEN_W-decor->w)/2, (SCREEN_H-decor->h)/2, decor->w, decor->h);
-    //blit(decor,screen,0,0, (SCREEN_W), (SCREEN_H), decor->w, decor->h);
-    int depy=5;
+    BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
+    clear_bitmap(page);
+    //blit(decor,screen,0,0, (SCREEN_W-decor->w)/2, (SCREEN_H-decor->h)/2, decor->w, decor->h);
+    //blit(decor,page,0,0, (SCREEN_W), (SCREEN_H), decor->w, decor->h);
+    /*int depy=5;
     int touche;
     // Boucle interactive
     while (!key[KEY_ESC]) {
@@ -103,28 +105,27 @@ int main()
     //blit(decor, decor_conv, 0, 0, 0, 0, decor->w, decor->h);
     //destroy_bitmap(decor);
 
-    BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
-    clear_bitmap(page);
+     */
     // Pourcentage de zoom (100 = taille normale, 50 = moitié, 200 = double)
-    int zoom = 10; // changez cette valeur
+    int zoom = 100; // changez cette valeur
 
     int largeur_affichee = (decor->w * zoom) / 100;
     int hauteur_affichee = (decor->h * zoom) / 100;
     stretch_blit(decor, page,
-                 0, 0, decor->w, decor->h,        // source : image entière
-                 0, 0, largeur_affichee, hauteur_affichee); // destination : zoomée
+                 0, 0, largeur_affichee, hauteur_affichee,        // source : image entière
+                 0, 0, SCREEN_W, SCREEN_H); // destination : zoomée
 
     //stretch_blit(decor_conv, page,
                 // 0, 0, decor_conv->w, decor_conv->h,
                 // 0, 0, SCREEN_W, SCREEN_H);
     //blit(decor_conv, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-    //blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     int tempoglobale = 30;
     while (!key[KEY_ESC]) { rest(tempoglobale); }
 
+    destroy_bitmap(page);
     destroy_bitmap(decor);
-    //destroy_bitmap(page);
     //destroy_bitmap(decor_conv);
     allegro_exit();
     return 0;
