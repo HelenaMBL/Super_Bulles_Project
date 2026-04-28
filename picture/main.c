@@ -9,9 +9,6 @@
 
 #define NIMAGE 14
 
-//#define APP_SCREEN_W 1920
-//#define APP_SCREEN_H 1080
-
 void initialisation_allegro() {
     allegro_init(); // appel obligatoire (var.globales, recup. infos syst me ...)
     install_keyboard(); //pour utiliser le clavier
@@ -101,32 +98,7 @@ int main()
     BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
     clear_bitmap(page);
 
-#if 0
-    BITMAP *ZeldaStatiqueTir=load_bitmap("../SpritesAnimation/LinkStatique.bmp", NULL);
-    if (!ZeldaStatiqueTir) {
-        allegro_message("Echec chargement bitmap '%s' [%s]", decorPath, allegro_error);
-        exit(EXIT_FAILURE);
-    }
-#endif
-
-
-
-    if (USE_FULLSCREEN) {
-        blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-    }
-    else {
-        stretch_blit(decor, page,
-                     0, 0, decor->w, decor->h,
-                     0, 0, SCREEN_W, SCREEN_H);
-    }
-
-    // Position de départ
-    //x=400;
-    //y=640;
-
-    //draw_sprite(page, ZeldaStatiqueTir, x, y);
-    //masked_blit(ZeldaStatiqueTir, page, 0, 0, x, y, ZeldaStatiqueTir->w, ZeldaStatiqueTir->h);
-
+    blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     // charger les images de la séquence d'animation
@@ -160,43 +132,42 @@ int main()
         // ( seulement utile sur cet exemple ou pour du debug )
         reglages(page,&tempoglobale,&dx,&tmpdx,&tmpimg);
 
-        // gestion déplacement du chat
-        if ( (x<0 && dx<0) || (x+tx>SCREEN_W && dx>0) )
-            dx = -dx;
-
-        cptdx++;
-        if (cptdx>=tmpdx){
-            cptdx=0;
-            x+=dx;
-        }
-
-        //y+=dy;
-
         // gestion enchainement des images
         // incrémenter imgcourante une fois sur tmpimg
         if (tmpimg < 1) tmpimg = 1;
         if (tmpimg > 50) tmpimg = 50; // limite pour éviter blocage
 
-        cptimg++;
-        if (cptimg >= tmpimg){
-            cptimg = 0;
-            imgcourante = (imgcourante + 1) % NIMAGE;
-            //imgcourante++;
-            //cptimg = 0;
+        if (key [KEY_RIGHT]) {
+            if ( (dx<0) || (x+tx>SCREEN_W && dx>0) )
+                dx = -dx;
+
+            cptdx++;
+            if (cptdx>=tmpdx){
+                cptdx=0;
+                x+=dx;
+            }
+            cptimg++;
+            if (cptimg >= tmpimg){
+                cptimg = 0;
+                imgcourante = (imgcourante + 1) % NIMAGE;
+            }
         }
 
+        if (key[KEY_LEFT]) {
+            if (dx>=0)
+            dx=-dx;
+            cptdx++;
+            if (cptdx>=tmpdx){
+                cptdx=0;
+                x+=dx;
+            }
+            cptimg++;
+            if (cptimg >= tmpimg){
+                cptimg = 0;
+                imgcourante = (imgcourante + 1) % NIMAGE;
 
-
-#if 0
-        cptimg++;
-        if (cptimg>=tmpimg){
-            cptimg=0;
-
-            imgcourante++;
-#endif
-
-
-
+            }
+        }
 
             // quand l'indice de l'image courante arrive à NIMAGE
             // on recommence la séquence à partir de 0
@@ -206,7 +177,6 @@ int main()
 
         // afficher l'image courante du chat (selon le sens...)
         if (dx>=0) {
-            //blit(img[imgcourante],page,0,0,x,y,img[imgcourante]->w,img[imgcourante]->h);
             draw_sprite(page,img[imgcourante],x,y);
         }
         else {
@@ -221,8 +191,8 @@ int main()
 
 
 
-    //destroy_bitmap(page);
-    //destroy_bitmap(decor);
+    destroy_bitmap(page);
+    destroy_bitmap(decor);
     allegro_exit();
     return 0;
 }
