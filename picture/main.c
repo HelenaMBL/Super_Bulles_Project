@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <allegro.h>
+#include <time.h>
+#include "animation.h"
 
 #define USE_FULLSCREEN 1
 //#define USE_FULLSCREEN 0
@@ -8,6 +10,8 @@
 #define APP_SCREEN_H (USE_FULLSCREEN ? 800 : 600)
 
 #define NIMAGE 14
+#define IMAGESTAT 14
+
 
 void initialisation_allegro() {
     allegro_init(); // appel obligatoire (var.globales, recup. infos syst me ...)
@@ -66,10 +70,14 @@ int main()
     int x,y;
     int dx,dy;
     int tx,ty;
+    time_t tmpcourant;
+    time_t lasttmpcourant;
+
+
 
     // Pour pouvoir avancer très lentement on avance moins souvent
     //  ( ajouter dx une fois tous les tmpdx, initialement à chaque fois )
-    int cptdx=0, tmpdx=5;
+    int tmpdx=5;
 
     // Gestion de l'enchainement des images de la séquence
     // indice de l'image courante
@@ -78,14 +86,12 @@ int main()
     int cptimg=0, tmpimg=7;
 
     // Séquence d'animation
-    BITMAP *img[NIMAGE];
+    BITMAP *animMarche[NIMAGE];
+    BITMAP *animStat[IMAGESTAT];
+    
 
     // La tempo générale (fonction rest) sera réglable
     int tempoglobale=10;
-
-    // Pour charger la séquence
-    int i;
-    char nomfichier[256];
 
     sprintf(decorPath, "../images/decorbis%s-24.bmp", (USE_FULLSCREEN) ? "1280x800" : "800x600");
 
@@ -101,30 +107,20 @@ int main()
     blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
-    // charger les images de la séquence d'animation
-    for (i=0;i<NIMAGE;i++)
-    {
-        // sprintf permet de faire un printf dans une chaine
-        sprintf(nomfichier,"../SpritesAnimation/deplacement/Warrior%d.bmp",i);
-
-        img[i] = load_bitmap(nomfichier,NULL);
-        if (!img[i]){
-            allegro_message("pas pu trouver %s",nomfichier);
-            exit(EXIT_FAILURE);
-        }
-    }
-
+    load_Anim(NIMAGE,"../SpritesAnimation/deplacement/Warrior%d.bmp" ,animMarche);
 
     // initialisation des données du personnage zelda
 
-    tx = img[0]->h; // pour la taille on se base sur la 1ère image de la séquence
-    ty = img[0]->w;
+    tx = animMarche[0]->h; // pour la taille on se base sur la 1ère image de la séquence
+    ty = animMarche[0]->w;
     x = 0;
     y = SCREEN_W/2-tx;
     dx = 5;
     dy = 0;
 
     while (!key[KEY_ESC]) {
+        time(&tmpcourant);
+
         // effacer buffer en appliquant décor  (pas de clear_bitmap)
         blit(decor,page,0,0,0,0,SCREEN_W,SCREEN_H);
 
@@ -140,34 +136,36 @@ int main()
         if (key [KEY_RIGHT]) {
             if ( (dx<0) || (x+tx>SCREEN_W && dx>0) )
                 dx = -dx;
-
-            cptdx++;
-            if (cptdx>=tmpdx){
-                cptdx=0;
+            if (difftime(tmpcourant,lasttmpcourant)*1000>=40) {
                 x+=dx;
+                tmpcourant=lasttmpcourant;
             }
             cptimg++;
             if (cptimg >= tmpimg){
-                cptimg = 0;
+                //cptimg = 0;
                 imgcourante = (imgcourante + 1) % NIMAGE;
             }
-        }
-
-        if (key[KEY_LEFT]) {
+        } else  if (key[KEY_LEFT]) {
             if (dx>=0)
-            dx=-dx;
-            cptdx++;
-            if (cptdx>=tmpdx){
-                cptdx=0;
+              dx=-dx;
+            if (difftime(tmpcourant,lasttmpcourant)*1000>=40){
                 x+=dx;
+                tmpcourant=lasttmpcourant;
             }
+
             cptimg++;
             if (cptimg >= tmpimg){
-                cptimg = 0;
+                //cptimg = 0;
                 imgcourante = (imgcourante + 1) % NIMAGE;
 
             }
-        }
+        } //else {
+            //dx=0;
+            //difftime(lasttmpcourant,tmpcourant)*1000>=40;
+           // load_Anim(IMAGESTAT,"../SpritesAnimation/deplacement/Warrior%d.bmp" ,animStat);
+
+        //}
+        
 
             // quand l'indice de l'image courante arrive à NIMAGE
             // on recommence la séquence à partir de 0
@@ -177,19 +175,17 @@ int main()
 
         // afficher l'image courante du chat (selon le sens...)
         if (dx>=0) {
-            draw_sprite(page,img[imgcourante],x,y);
+            draw_sprite(page,animMarche[imgcourante],x,y);
         }
         else {
-            draw_sprite_h_flip(page,img[imgcourante],x,y);
+            draw_sprite_h_flip(page,animMarche[imgcourante],x,y);
         }
         // affichage du buffer à l'écran
         textprintf_ex(page,font,10,10,makecol(255,255,255),0,
-"img=%d cptimg=%d tmpimg=%d",imgcourante,cptimg,tmpimg);
+"animMarche=%d cptimg=%d tmpimg=%d",imgcourante,cptimg,tmpimg);
         blit(page,screen,0,0,0,0,SCREEN_W,SCREEN_H);
         rest(tempoglobale);
     }
-
-
 
     destroy_bitmap(page);
     destroy_bitmap(decor);
