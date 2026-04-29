@@ -10,7 +10,7 @@
 #define APP_SCREEN_H (USE_FULLSCREEN ? 800 : 600)
 
 #define NIMAGE 14
-#define IMAGESTAT 14
+#define IMAGESTAT 7
 
 
 void initialisation_allegro() {
@@ -32,8 +32,8 @@ void initialisation_allegro() {
 clock_t diffMilliseconds(clock_t end, clock_t start) {
     return (end - start) * 1000 / CLOCKS_PER_SEC;
 }
-#define FRAME_DURATION 40
-#define DELTA_X 5
+#define FRAME_DURATION 80
+#define DELTA_X 14
 // Sous programme pour jouer avec les parametres
 void reglages(BITMAP *bmp,int *ptempoglobale,int *pdx,int *ptmpdx,int *ptmpimg) {
     textprintf_ex(bmp,font,16,20,makecol(255,255,255),0,"F1 - F2 : tempoglobale = %d",*ptempoglobale);
@@ -78,7 +78,7 @@ int main()
 
     // Pour pouvoir avancer très lentement on avance moins souvent
     //  ( ajouter dx une fois tous les tmpdx, initialement à chaque fois )
-    int tmpdx=5;
+    int tmpdx=14;
 
     // Gestion de l'enchainement des images de la séquence
     // indice de l'image courante
@@ -109,6 +109,7 @@ int main()
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     load_Anim(NIMAGE,"../SpritesAnimation/deplacement/Warrior%d.bmp", animMarche);
+    load_Anim(IMAGESTAT,"../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp", animStat);
 
     // initialisation des données du personnage zelda
 
@@ -116,7 +117,7 @@ int main()
     ty = animMarche[0]->w;
     x = 0;
     y = SCREEN_W/2-tx;
-    dx = 5;
+    //dx = 10;
     dy = 0;
 
     clock_t  lastClock = 0;
@@ -158,20 +159,23 @@ int main()
                 imgcourante = (imgcourante + 1) % NIMAGE;
                 lastClock = currentClock;
             }
-        } //else {
-            //dx=0;
-            //difftime(lasttmpcourant,tmpcourant)*1000>=40;
-           // load_Anim(IMAGESTAT,"../SpritesAnimation/deplacement/Warrior%d.bmp" ,animStat);
-
-        //}
-        
+        } else if (!key[KEY_RIGHT] && !key[KEY_LEFT]) {
+            dx=0;
+            if (diffMilliseconds(currentClock, lastClock) >=300) {
+                lastClock = currentClock;
+                imgcourante = (imgcourante + 1) % IMAGESTAT;
+            }
+        }
 
         // afficher l'image courante du chat (selon le sens...)
-        if (dx>=0) {
+        if (dx>0) {
             draw_sprite(page,animMarche[imgcourante],x,y);
         }
-        else {
+        else if (dx<0) {
             draw_sprite_h_flip(page,animMarche[imgcourante],x,y);
+        }
+        else if (dx==0) {
+            draw_sprite(page,animStat[imgcourante],x,y);
         }
         // affichage du buffer à l'écran
         textprintf_ex(page,font,10,10,makecol(255,255,255),0,
