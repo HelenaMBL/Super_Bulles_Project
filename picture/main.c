@@ -29,6 +29,11 @@ void initialisation_allegro() {
     }
 }
 
+clock_t diffMilliseconds(clock_t end, clock_t start) {
+    return (end - start) * 1000 / CLOCKS_PER_SEC;
+}
+#define FRAME_DURATION 40
+#define DELTA_X 5
 // Sous programme pour jouer avec les parametres
 void reglages(BITMAP *bmp,int *ptempoglobale,int *pdx,int *ptmpdx,int *ptmpimg) {
     textprintf_ex(bmp,font,16,20,makecol(255,255,255),0,"F1 - F2 : tempoglobale = %d",*ptempoglobale);
@@ -70,10 +75,6 @@ int main()
     int x,y;
     int dx,dy;
     int tx,ty;
-    time_t tmpcourant;
-    time_t lasttmpcourant;
-
-
 
     // Pour pouvoir avancer très lentement on avance moins souvent
     //  ( ajouter dx une fois tous les tmpdx, initialement à chaque fois )
@@ -86,8 +87,8 @@ int main()
     int cptimg=0, tmpimg=7;
 
     // Séquence d'animation
-    BITMAP *animMarche[NIMAGE];
-    BITMAP *animStat[IMAGESTAT];
+    BITMAP* animMarche[NIMAGE];
+    BITMAP* animStat[IMAGESTAT];
     
 
     // La tempo générale (fonction rest) sera réglable
@@ -107,7 +108,7 @@ int main()
     blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
-    load_Anim(NIMAGE,"../SpritesAnimation/deplacement/Warrior%d.bmp" ,animMarche);
+    load_Anim(NIMAGE,"../SpritesAnimation/deplacement/Warrior%d.bmp", animMarche);
 
     // initialisation des données du personnage zelda
 
@@ -118,8 +119,11 @@ int main()
     dx = 5;
     dy = 0;
 
+    clock_t  lastClock = 0;
+    clock_t  currentClock;
+
     while (!key[KEY_ESC]) {
-        time(&tmpcourant);
+        currentClock = clock();
 
         // effacer buffer en appliquant décor  (pas de clear_bitmap)
         blit(decor,page,0,0,0,0,SCREEN_W,SCREEN_H);
@@ -133,31 +137,26 @@ int main()
         if (tmpimg < 1) tmpimg = 1;
         if (tmpimg > 50) tmpimg = 50; // limite pour éviter blocage
 
+        //textprintf_ex(page,font,16,60,makecol(255,255,255),0,"DIF time : DIF time = %f",difftime(currentTime,lastTime) *1000);
         if (key [KEY_RIGHT]) {
-            if ( (dx<0) || (x+tx>SCREEN_W && dx>0) )
-                dx = -dx;
-            if (difftime(tmpcourant,lasttmpcourant)*1000>=40) {
+            dx = DELTA_X;
+            if (diffMilliseconds(currentClock, lastClock) >=FRAME_DURATION){
+                if (x+tx>SCREEN_W)
+                    dx = 0;
                 x+=dx;
-                tmpcourant=lasttmpcourant;
-            }
-            cptimg++;
-            if (cptimg >= tmpimg){
-                //cptimg = 0;
                 imgcourante = (imgcourante + 1) % NIMAGE;
+                lastClock = currentClock;
             }
-        } else  if (key[KEY_LEFT]) {
-            if (dx>=0)
-              dx=-dx;
-            if (difftime(tmpcourant,lasttmpcourant)*1000>=40){
+        }
+
+        if (key[KEY_LEFT]) {
+            dx = -DELTA_X;
+            if (diffMilliseconds(currentClock, lastClock) >=FRAME_DURATION){
+                if (x<=0)
+                    dx = 0;
                 x+=dx;
-                tmpcourant=lasttmpcourant;
-            }
-
-            cptimg++;
-            if (cptimg >= tmpimg){
-                //cptimg = 0;
                 imgcourante = (imgcourante + 1) % NIMAGE;
-
+                lastClock = currentClock;
             }
         } //else {
             //dx=0;
@@ -166,12 +165,6 @@ int main()
 
         //}
         
-
-            // quand l'indice de l'image courante arrive à NIMAGE
-            // on recommence la séquence à partir de 0
-            if (imgcourante>=NIMAGE){
-                imgcourante=0;
-        }
 
         // afficher l'image courante du chat (selon le sens...)
         if (dx>=0) {
@@ -184,7 +177,7 @@ int main()
         textprintf_ex(page,font,10,10,makecol(255,255,255),0,
 "animMarche=%d cptimg=%d tmpimg=%d",imgcourante,cptimg,tmpimg);
         blit(page,screen,0,0,0,0,SCREEN_W,SCREEN_H);
-        rest(tempoglobale);
+        //rest(tempoglobale);
     }
 
     destroy_bitmap(page);

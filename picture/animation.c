@@ -7,7 +7,7 @@
 #include <allegro/gfx.h>
 #include <allegro/system.h>
 
-void load_Anim(int nbrimages,char* pathfichier ,BITMAP *tab[nbrimages]) {
+void load_Anim(int nbrimages,char* pathfichier, BITMAP *tab[nbrimages]) {
     // charger les images de la séquence d'animation
 
     for (int i=0;i<nbrimages;i++)
