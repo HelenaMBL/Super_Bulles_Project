@@ -124,9 +124,17 @@ int main()
     Animation bulleAnim;
 
     Objet decor = {0};
-    Objet marche = {0};
-    Objet attend = {0};
+    Objet warrior = {0};
     Objet bulle = {0};
+
+    decor.animation = &decorAnim;
+    warrior.animation = &attendAnim;
+    bulle.animation = &bulleAnim;
+
+    tx = marcheAnim.images[0]->h; // pour la taille on se base sur la 1ère image de la séquence
+    warrior.y = SCREEN_W/2-tx;
+    warrior.y = 0;
+
 
     bulle.x = rand() % SCREEN_W;
     bulle.y = 0;
@@ -145,16 +153,17 @@ int main()
     //    allegro_message("Echec chargement bitmap '%s' [%s]", decorPath, allegro_error);
     //    exit(EXIT_FAILURE);
     //}
+    load_Anim(&marcheAnim, 14, "../SpritesAnimation/deplacement/Warrior%d.bmp");
+    load_Anim(&attendAnim,7, "../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp");
+    load_Anim(&bulleAnim,1, "../SpritesAnimation/BulleNiv1.bmp");
 
     BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
     clear_bitmap(page);
 
+    //draw_objectSprite(&decor, page);
     blit(decorAnim.images[0], page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
-    load_Anim(&marcheAnim, 14, "../SpritesAnimation/deplacement/Warrior%d.bmp");
-    load_Anim(&attendAnim,7, "../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp");
-    load_Anim(&bulleAnim,1, "../SpritesAnimation/BulleNiv1.bmp");
 
     // initialisation des données du personnage zelda
 
@@ -188,58 +197,61 @@ int main()
         if (tmpimg < 1) tmpimg = 1;
         if (tmpimg > 50) tmpimg = 50; // limite pour éviter blocage
 
+        bool changeFrame = diffMilliseconds(currentClock, lastClock) >=FRAME_DURATION;
+
         //textprintf_ex(page,font,16,60,makecol(255,255,255),0,"DIF time : DIF time = %f",difftime(currentTime,lastTime) *1000);
+
         if (key [KEY_RIGHT]) {
             dx = DELTA_X;
-            if (diffMilliseconds(currentClock, lastClock) >=FRAME_DURATION){
+            if (changeFrame){
                 if (x+tx>SCREEN_W)
                     dx = 0;
-                x+=dx;
-                imgcourante = (imgcourante + 1) % marcheAnim.nbrFrames;
-                lastClock = currentClock;
             }
         }
-
         if (key[KEY_LEFT]) {
             dx = -DELTA_X;
-            if (diffMilliseconds(currentClock, lastClock) >=FRAME_DURATION){
+            if (changeFrame){
                 if (x<=0)
                     dx = 0;
-                x+=dx;
-                imgcourante = (imgcourante + 1) % marcheAnim.nbrFrames;
-                lastClock = currentClock;
             }
         } else if (!key[KEY_RIGHT] && !key[KEY_LEFT]) {
             dx=0;
-            if (diffMilliseconds(currentClock, lastClock) >=300) {
-                lastClock = currentClock;
-                imgcouranteStat = (imgcouranteStat + 1) % attendAnim.nbrFrames;
-            }
+        }
+        if (changeFrame){
+            x+=dx;
+
+            increment_Anim(&decorAnim);
+            increment_Anim(&marcheAnim);
+            increment_Anim(&attendAnim);
+            increment_Anim(&bulleAnim);
+            lastClock = currentClock;
         }
 
         // afficher l'image courante du chat (selon le sens...)
         if (dx>0) {
-            draw_sprite(page,marcheAnim.images[imgcourante],x,y);
+            warrior.flip = false;
+            warrior.animation = &marcheAnim;
+            //draw_sprite(page,marcheAnim.images[imgcourante],x,y);
         }
         else if (dx<0) {
-            draw_sprite_h_flip(page,marcheAnim.images[imgcourante],x,y);
+            warrior.flip = true;
+            warrior.animation = &marcheAnim;
+            //draw_sprite_h_flip(page,marcheAnim.images[imgcourante],x,y);
         }
         else if (dx==0) {
-            draw_sprite(page,attendAnim.images[imgcouranteStat],x,y);
+            warrior.animation = &attendAnim;
+            //draw_sprite(page,attendAnim.images[imgcouranteStat],x,y);
         }
         // affichage du buffer à l'écran
-        textprintf_ex(page,font,10,10,makecol(255,255,255),0,
-"animMarche=%d cptimg=%d tmpimg=%d",imgcourante,cptimg,tmpimg);
-        //blit(page,screen,0,0,0,0,SCREEN_W,SCREEN_H);
-        //rest(tempoglobale);
+        deplacement_Bulle(&bulle);
 
-        //b.x += b.vx;
-        //b.y += b.vy;
-
+        blit(decorAnim.images[0], page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        //draw_objectSprite(&decor, page);
+        //draw_objectSprite(&warrior, page);
+        //draw_objectSprite(&bulle, page);
 
         //draw_sprite(page, Bulle_Niv1, b.x, b.y);
-        deplacement_Bulle(&bulle);
-        blit(bulleAnim.images[0],page,0,0,bulle.x,bulle.y,SCREEN_W,SCREEN_H);
+        //blit(bulleAnim.images[0],page,0,0,bulle.x,bulle.y,SCREEN_W,SCREEN_H);
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     }

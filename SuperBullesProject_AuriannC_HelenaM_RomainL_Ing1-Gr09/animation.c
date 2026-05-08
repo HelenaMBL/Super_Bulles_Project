@@ -38,13 +38,13 @@ void increment_Anim(Animation* p) {
 
 
 
+#if 0
 #define FRAME_DURATION 80
 #define DELTA_X 14
 // Séquence d'animation
 #define NIMAGE 14
 #define IMAGESTAT 7
 
-#if 0
 void bulle(BITMAP *page, BITMAP* decor,  BITMAP *animMarche[],
           BITMAP *animStat[]) {
     BITMAP* Bulle_Niv1 = load_bitmap("../SpritesAnimation/BulleNiv1.bmp", NULL);
