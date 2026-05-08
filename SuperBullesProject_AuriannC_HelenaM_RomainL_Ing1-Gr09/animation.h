@@ -1,33 +1,18 @@
-//
-// Created by helen on 29/04/2026.
-//
+#ifndef ANIMATION_H
+#define ANIMATION_H
 
-#ifndef PICTURE_ANIMATION_H
-#define PICTURE_ANIMATION_H
-
-#endif //PICTURE_ANIMATION_H
+#include <allegro/gfx.h>
 
 typedef struct {
     int nbrFrames;
-    BITMAP** images; //taleau de bitmaps(pointeurs)
-} AnimationMa;
+    int currentFrame;
+    BITMAP** images; //tableau de bitmaps(pointeurs)
+} Animation;
 
 
-void load_Anim(int nbrimages,char* pathfichier ,BITMAP *tab[nbrimages]);
-void load_AnimStruct(AnimationMa* p, int nbrimages, char* pathfichier);
-
-typedef struct {
-    int x;
-    int y;
-    int vx;
-    int vy;
-} Bulle;
-
-
-
-
-
-
-void deplacement_Bulles(Bulle *b);
+void load_bitmaps(int nbrimages,char* pathfichier ,BITMAP *tab[nbrimages]);
+void load_Anim(Animation* p, int nbrimages, char* pathfichier);
+void increment_Anim(Animation* p);
 
 void jeu();
+#endif //ANIMATION_H
