@@ -123,6 +123,14 @@ int main()
     clock_t  lastClock = 0;
     clock_t  currentClock;
 
+    //téléchargement d'une police plus grande
+    FONT *font_32 = load_font("font_32.fnt", NULL, NULL);//modifier le font
+    //vérifier si le fichier de police est bien trouvé
+    if (!font_32) {
+        allegro_message("ERREUR: font_32.fnt introuvable !");
+        return 1;
+    }
+
     while (!key[KEY_ESC]) {
         currentClock = clock();
 
@@ -132,7 +140,13 @@ int main()
         // appel d'un sous programme de réglage interactif des parametres
         // ( seulement utile sur cet exemple ou pour du debug )
         reglages(page,&tempoglobale,&dx,&tmpdx,&tmpimg);
-
+        char *msg_no_save = "-Aucune sauvegarde trouvée-";
+        /*textout_centre_ex(page, font_test, msg_no_save,
+                   SCREEN_W/2, SCREEN_H/2,
+                   makecol(255,255,255), -1);*/
+        //textprintf_ex(page, font_32,(SCREEN_W-text_length(font_32, msg_no_save))/2, SCREEN_H/2,makecol(255,255,255), 0,"-Aucune sauvegarde-");
+        textprintf_ex(page, font, SCREEN_W/2, SCREEN_H/2,makecol(255,255,255), 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        //textout_ex(page, font, "TEST", 100, 100, makecol(255,255,255), -1);
         // gestion enchainement des images
         // incrémenter imgcourante une fois sur tmpimg
         if (tmpimg < 1) tmpimg = 1;
