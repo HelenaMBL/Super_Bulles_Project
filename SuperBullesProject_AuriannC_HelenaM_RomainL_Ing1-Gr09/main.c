@@ -88,14 +88,17 @@ int main()
     Animation marcheAnim;
     Animation attendAnim;
     Animation bulleAnim;
+    Animation tirAnim;
 
     Objet decor = {0};
     Objet warrior = {0};
     Objet bulle = {0};
+    Objet tir = {0};
 
     decor.animation = &decorAnim;
     warrior.animation = &attendAnim;
     bulle.animation = &bulleAnim;
+    tir.animation = &tirAnim;
 
     bulle.x = rand() % SCREEN_W;
     bulle.y = 0;
@@ -109,6 +112,7 @@ int main()
     load_Anim(&marcheAnim, 14, "../SpritesAnimation/deplacement/Warrior%d.bmp");
     load_Anim(&attendAnim,7, "../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp");
     load_Anim(&bulleAnim,1, "../SpritesAnimation/BulleNiv1.bmp");
+    load_Anim(&tirAnim,1, "../SpritesAnimation/tirWarrior.bmp");
 
     BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
     clear_bitmap(page);
@@ -187,6 +191,10 @@ int main()
         draw_objectSprite(&decor, page);
         draw_objectSprite(&warrior, page);
         draw_objectSprite(&bulle, page);
+
+        if (key[KEY_SPACE]) {
+            draw_objectSprite(&tir, page);
+        }
 
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
