@@ -2,6 +2,7 @@
 *.docx
 *.pdf
 *.tmp
+*.zip
 **/.idea/
 # Default ignored files
 **/shelf/
