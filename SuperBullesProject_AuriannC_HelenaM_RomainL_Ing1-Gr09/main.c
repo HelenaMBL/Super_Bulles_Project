@@ -131,9 +131,6 @@ int main()
     warrior.animation = &attendAnim;
     bulle.animation = &bulleAnim;
 
-    tx = marcheAnim.images[0]->h; // pour la taille on se base sur la 1ère image de la séquence
-    warrior.y = SCREEN_W/2-tx;
-    warrior.y = 0;
 
 
     bulle.x = rand() % SCREEN_W;
@@ -160,8 +157,8 @@ int main()
     BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
     clear_bitmap(page);
 
-    //draw_objectSprite(&decor, page);
-    blit(decorAnim.images[0], page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    draw_objectSprite(&decor, page);
+    //blit(decorAnim.images[0], page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
 
@@ -245,10 +242,9 @@ int main()
         // affichage du buffer à l'écran
         deplacement_Bulle(&bulle);
 
-        blit(decorAnim.images[0], page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-        //draw_objectSprite(&decor, page);
-        //draw_objectSprite(&warrior, page);
-        //draw_objectSprite(&bulle, page);
+        draw_objectSprite(&decor, page);
+        draw_objectSprite(&warrior, page);
+        draw_objectSprite(&bulle, page);
 
         //draw_sprite(page, Bulle_Niv1, b.x, b.y);
         //blit(bulleAnim.images[0],page,0,0,bulle.x,bulle.y,SCREEN_W,SCREEN_H);
