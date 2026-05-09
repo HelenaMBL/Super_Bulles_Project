@@ -8,7 +8,7 @@
 #include <allegro/system.h>
 #include "animation.h"
 
-void load_Anim(int nbrimages,char* pathfichier, BITMAP *tab[nbrimages]) {
+void load_bitmaps(int nbrimages,char* pathfichier, BITMAP *tab[nbrimages]) {
     // charger les images de la séquence d'animation
 
     for (int i=0;i<nbrimages;i++)
@@ -26,23 +26,51 @@ void load_Anim(int nbrimages,char* pathfichier, BITMAP *tab[nbrimages]) {
 
 }
 
-void load_AnimStruct(AnimationMa* p, int nbrimages, char* pathfichier) {
+void load_Anim(Animation* p, int nbrimages, char* pathfichier) {
     p->nbrFrames=nbrimages;
     p->images=malloc(sizeof(BITMAP *) * nbrimages);
-    load_Anim(nbrimages, pathfichier, p->images);
+    load_bitmaps(nbrimages, pathfichier, p->images);
+}
+
+void increment_Anim(Animation* p) {
+    p->currentFrame = (p->currentFrame + 1) % p->nbrFrames;
 }
 
 
 
-
+#if 0
 #define FRAME_DURATION 80
 #define DELTA_X 14
 // Séquence d'animation
 #define NIMAGE 14
 #define IMAGESTAT 7
 
+void bulle(BITMAP *page, BITMAP* decor,  BITMAP *animMarche[],
+          BITMAP *animStat[]) {
+    BITMAP* Bulle_Niv1 = load_bitmap("../SpritesAnimation/BulleNiv1.bmp", NULL);
+    //srand(time(NULL));
 
-#if 0
+    Bulle b;
+
+    // SPAWN INITIAL
+    b.x = rand() % SCREEN_W;
+    b.y = 0;
+    //b.t = 0;
+
+    deplacement_Bulles(&b);
+    blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    // UPDATE POSITION
+    b.x += b.vx;
+    b.y += b.vy;
+
+    // b.x += (int)(3 * sin(b.t));
+
+    draw_sprite(page, Bulle_Niv1, b.x, b.y);
+    blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+}
+
+
 clock_t diffMilliseconds(clock_t end, clock_t start) {
     return (end - start) * 1000 / CLOCKS_PER_SEC;
 }
@@ -88,8 +116,8 @@ void deplacement_Warrior () {
     blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
-    load_Anim(NIMAGE,"../SpritesAnimation/deplacement/Warrior%d.bmp", animMarche);
-    load_Anim(IMAGESTAT,"../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp", animStat);
+    load_bitmaps(NIMAGE,"../SpritesAnimation/deplacement/Warrior%d.bmp", animMarche);
+    load_bitmaps(IMAGESTAT,"../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp", animStat);
 
     // initialisation des données du personnage zelda
 
@@ -171,59 +199,6 @@ void deplacement_Warrior () {
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     }
-}
-
-
-
-void deplacement_Bulles(Bulle *b) {
-
-    if (b->x > SCREEN_W / 2) {
-
-        int choix = rand() % 2 +1;
-
-        if (choix == 1) {
-            // diagonale gauche (retour centre)
-            b->vx = -1;
-            b->vy = 2;
-        }
-        else if (choix == 2) {
-            // légère droite
-            b->vx = 1;
-            b->vy = 2;
-        }
-        else {
-            b->vx = 0;
-
-
-        }
-
-
-    }
-}
-
-void jeu(BITMAP *page, BITMAP* decor,  BITMAP *animMarche[],
-          BITMAP *animStat[]) {
-    BITMAP* Bulle_Niv1 = load_bitmap("../SpritesAnimation/BulleNiv1.bmp", NULL);
-    //srand(time(NULL));
-
-    Bulle b;
-
-    // SPAWN INITIAL
-    b.x = rand() % SCREEN_W;
-    b.y = 0;
-    //b.t = 0;
-
-    deplacement_Bulles(&b);
-    blit(decor, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-    // UPDATE POSITION
-    b.x += b.vx;
-    b.y += b.vy;
-
-    // b.x += (int)(3 * sin(b.t));
-
-    draw_sprite(page, Bulle_Niv1, b.x, b.y);
-    blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
 }
 #endif
 
