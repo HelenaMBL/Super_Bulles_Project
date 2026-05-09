@@ -185,6 +185,10 @@ int main()
         else if (dx==0) {
             warrior.animation = &attendAnim;
         }
+        if (key[KEY_SPACE]) {
+            warrior.animation = &tirAnim;
+            //draw_objectSprite(&tir, page);
+        }
 
         deplacement_Bulle(&bulle);
 
@@ -192,9 +196,6 @@ int main()
         draw_objectSprite(&warrior, page);
         draw_objectSprite(&bulle, page);
 
-        if (key[KEY_SPACE]) {
-            draw_objectSprite(&tir, page);
-        }
 
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
