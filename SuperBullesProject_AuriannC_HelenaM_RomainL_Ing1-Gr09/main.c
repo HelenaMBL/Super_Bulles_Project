@@ -2,9 +2,9 @@
 #include <allegro.h>
 #include <time.h>
 #include "object.h"
+#include "reglages.h"
+#include "constantes.h"
 
-#define USE_FULLSCREEN 1
-//#define USE_FULLSCREEN 0
 #define APP_CARD (USE_FULLSCREEN ? GFX_AUTODETECT_FULLSCREEN : GFX_AUTODETECT_WINDOWED)
 #define APP_SCREEN_W (USE_FULLSCREEN ? 1280 : 800)
 #define APP_SCREEN_H (USE_FULLSCREEN ? 800 : 600)
@@ -24,39 +24,6 @@ void initialisation_allegro() {
 
 clock_t diffMilliseconds(clock_t end, clock_t start) {
     return (end - start) * 1000 / CLOCKS_PER_SEC;
-}
-
-#define FRAME_DURATION 80
-#define DELTA_X 14
-// Sous programme pour jouer avec les parametres
-void reglages(BITMAP *bmp,int *ptempoglobale,int *pdx,int *ptmpdx,int *ptmpimg) {
-    textprintf_ex(bmp,font,16,20,makecol(255,255,255),0,"F1 - F2 : tempoglobale = %d",*ptempoglobale);
-    textprintf_ex(bmp,font,16,30,makecol(255,255,255),0,"F3 - F4 :           dx = %d",*pdx);
-    textprintf_ex(bmp,font,16,40,makecol(255,255,255),0,"F5 - F6 :        tmpdx = %d",*ptmpdx);
-    textprintf_ex(bmp,font,16,50,makecol(255,255,255),0,"F7 - F8 :       tmpimg = %d",*ptmpimg);
-
-
-    if (key[KEY_F1]) (*ptempoglobale)--;
-    if (*ptempoglobale<0) *ptempoglobale=0;
-    if (key[KEY_F2]) (*ptempoglobale)++;
-    if (*ptempoglobale>100) *ptempoglobale=100;
-
-    if ( (key[KEY_F3] && *pdx>0) || (key[KEY_F4] && *pdx<0) ) (*pdx)--;
-    //if ( (key[KEY_LEFT] && *pdx>0) || (key[KEY_F4] && *pdx<0) ) (*pdx)--;
-    if ( (key[KEY_F4] && *pdx>0) || (key[KEY_F3] && *pdx<0) ) (*pdx)++;
-    //if ( (key[KEY_RIGHT] && *pdx>0) || (key[KEY_F3] && *pdx<0) ) (*pdx)++;
-    if ( key[KEY_RIGHT] && *pdx==0 ) (*pdx)++;
-
-    if (key[KEY_F5]) (*ptmpdx)--;
-    if (*ptmpdx<1) *ptmpdx=1;
-    if (key[KEY_F6]) (*ptmpdx)++;
-    if (*ptmpdx>100) *ptmpdx=100;
-
-    if (key[KEY_F7]) (*ptmpimg)--;
-    if (*ptmpimg<1) *ptmpimg=1;
-    if (key[KEY_F8]) (*ptmpimg)++;
-    if (*ptmpimg>100) *ptmpimg=100;
-
 }
 
 
@@ -84,11 +51,12 @@ int main()
     int cptimg=0, tmpimg=7;
 
     // Séquence d'animation de chargement
-    Animation decorAnim;
-    Animation marcheAnim;
-    Animation attendAnim;
-    Animation bulleAnim;
-    Animation tirAnim;
+    Animation decorAnim = {0};
+    Animation marcheAnim = {0};
+    Animation attendAnim = {0};
+    Animation bulleAnim = {0};
+    Animation tirAnim = {0};
+    tirAnim.offsetY=-45;
 
     Objet decor = {0};
     Objet warrior = {0};
@@ -102,6 +70,8 @@ int main()
 
     bulle.x = rand() % SCREEN_W;
     bulle.y = 0;
+
+    Partie partie = {0};
 
     // La tempo générale (fonction rest) sera réglable
     int tempoglobale=10;
@@ -138,7 +108,7 @@ int main()
         currentClock = clock();
 
         blit(decorAnim.images[0],page,0,0,0,0,SCREEN_W,SCREEN_H);
-        reglages(page,&tempoglobale,&dx,&tmpdx,&tmpimg);
+        affichageData(page,&partie); // ,&dx,&tmpdx,&tmpimg);
         
         // incrémenter imgcourante une fois sur tmpimg
         if (tmpimg < 1) tmpimg = 1;
@@ -186,6 +156,7 @@ int main()
             warrior.animation = &attendAnim;
         }
         if (key[KEY_SPACE]) {
+
             warrior.animation = &tirAnim;
             //draw_objectSprite(&tir, page);
         }

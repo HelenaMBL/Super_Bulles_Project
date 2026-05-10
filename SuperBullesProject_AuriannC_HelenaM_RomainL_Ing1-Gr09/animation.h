@@ -6,6 +6,7 @@
 typedef struct {
     int nbrFrames;
     int currentFrame;
+    int offsetX, offsetY;
     BITMAP** images; //tableau de bitmaps(pointeurs)
 } Animation;
 
