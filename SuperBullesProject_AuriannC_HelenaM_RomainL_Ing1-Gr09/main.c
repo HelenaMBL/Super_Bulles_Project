@@ -5,9 +5,6 @@
 #include "reglages.h"
 #include "constantes.h"
 
-#define APP_CARD (USE_FULLSCREEN ? GFX_AUTODETECT_FULLSCREEN : GFX_AUTODETECT_WINDOWED)
-#define APP_SCREEN_W (USE_FULLSCREEN ? 1280 : 800)
-#define APP_SCREEN_H (USE_FULLSCREEN ? 800 : 600)
 
 void initialisation_allegro() {
     allegro_init(); // appel obligatoire (var.globales, recup. infos syst me ...)
@@ -56,20 +53,34 @@ int main()
     Animation attendAnim = {0};
     Animation bulleAnim = {0};
     Animation tirAnim = {0};
-    tirAnim.offsetY=-45;
+    tirAnim.offsetY=-72;
+    Animation* animations[] = {
+        &decorAnim,
+        &marcheAnim,
+        &attendAnim,
+        &bulleAnim,
+        &tirAnim
+    };
 
     Objet decor = {0};
     Objet warrior = {0};
-    Objet bulle = {0};
-    Objet tir = {0};
+    Objet bulle1 = {0};
+    Objet bulle2 = {0};
+    Objet bulle3 = {0};
+
+    Objet* objects[] = {
+        &decor,
+        &warrior,
+        &bulle1,
+        &bulle2,
+        &bulle3,
+    };
 
     decor.animation = &decorAnim;
     warrior.animation = &attendAnim;
-    bulle.animation = &bulleAnim;
-    tir.animation = &tirAnim;
-
-    bulle.x = rand() % SCREEN_W;
-    bulle.y = 0;
+    bulle1.animation = &bulleAnim;
+    bulle2.animation = &bulleAnim;
+    bulle3.animation = &bulleAnim;
 
     Partie partie = {0};
 
@@ -96,13 +107,16 @@ int main()
     clock_t  lastClock = 0;
     clock_t  currentClock;
 
-    init_bulle_big(&bulle, &bulleAnim, 0, SCREEN_W/2-tx);
+    init_bulle_big(&bulle1, &bulleAnim, 0, SCREEN_W/2-tx);
+    init_bulle_big(&bulle2, &bulleAnim, 0, SCREEN_W/2-tx);
+    init_bulle_big(&bulle3, &bulleAnim, 0, SCREEN_W/2-tx);
 
-    bulle.y = 0;
-    bulle.x=rand()%SCREEN_W;
-    bulle.vy = 0;
-    bulle.vx = 0; // entre -2 et 2
-    if (bulle.vx == 0) bulle.vx = 1; // évite vx nul
+    bulle1.x=rand()%SCREEN_W;
+    if (bulle1.vx == 0) bulle1.vx = 1; // évite vx nul
+    bulle2.x=rand()%SCREEN_W;
+    if (bulle2.vx == 0) bulle2.vx = 1; // évite vx nul
+    bulle3.x=rand()%SCREEN_W;
+    if (bulle3.vx == 0) bulle3.vx = 1; // évite vx nul
 
     while (!key[KEY_ESC]) {
         currentClock = clock();
@@ -135,10 +149,13 @@ int main()
         if (changeFrame){
             warrior.x+=dx;
 
-            increment_Anim(&decorAnim);
-            increment_Anim(&marcheAnim);
-            increment_Anim(&attendAnim);
-            increment_Anim(&bulleAnim);
+            for (int cpt = 0; cpt < ARRAY_COUNT(animations); cpt++) {
+                increment_Anim(animations[cpt]);
+            }
+            //increment_Anim(&decorAnim);
+            //increment_Anim(&marcheAnim);
+            //increment_Anim(&attendAnim);
+            //increment_Anim(&bulleAnim);
             lastClock = currentClock;
         }
 
@@ -146,7 +163,6 @@ int main()
         if (dx>0) {
             warrior.flip = false;
             warrior.animation = &marcheAnim;
-            //draw_sprite(page,marcheAnim.images[imgcourante],x,y);
         }
         else if (dx<0) {
             warrior.flip = true;
@@ -158,14 +174,19 @@ int main()
         if (key[KEY_SPACE]) {
 
             warrior.animation = &tirAnim;
-            //draw_objectSprite(&tir, page);
         }
 
-        deplacement_Bulle(&bulle);
+        deplacement_Bulle(&bulle1);
+        deplacement_Bulle(&bulle2);
+        deplacement_Bulle(&bulle3);
 
-        draw_objectSprite(&decor, page);
-        draw_objectSprite(&warrior, page);
-        draw_objectSprite(&bulle, page);
+
+        for (int cpt = 0; cpt < ARRAY_COUNT(objects); cpt++) {
+            draw_objectSprite(objects[cpt], page);
+        }
+        //draw_objectSprite(&decor, page);
+        //draw_objectSprite(&warrior, page);
+        //draw_objectSprite(&bulle, page);
 
 
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -176,7 +197,9 @@ int main()
 
 
     destroy_bitmap(page);
-    destroy_bitmap(decorAnim.images[0]);
+    for (int cpt = 0; cpt < ARRAY_COUNT(animations); cpt++) {
+        destroy_bitmap(animations[cpt]->images[0]);
+    }
     allegro_exit();
     return 0;
 }

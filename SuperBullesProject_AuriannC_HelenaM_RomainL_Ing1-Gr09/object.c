@@ -64,10 +64,13 @@ void deplacement_Bulle(Objet *bulle) {
 
 
 void draw_objectSprite(Objet* p, BITMAP* page) {
+    int x = p->x + p->animation->offsetX;
+    int y = p->y + p->animation->offsetY;
+    BITMAP* currentFrame = p->animation->images[p->animation->currentFrame];
     if (p->flip)
-        draw_sprite_h_flip(page,p->animation->images[p->animation->currentFrame], p->x, p->y);
+        draw_sprite_h_flip(page, currentFrame, x, y);
     else
-        draw_sprite(page,p->animation->images[p->animation->currentFrame], p->x, p->y);
+        draw_sprite(page,currentFrame, x, y);
 }
 
 int collision_bulle_tir(Objet* bulle, int tirX, int tirY)
