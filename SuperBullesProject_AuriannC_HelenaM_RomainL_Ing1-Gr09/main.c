@@ -53,13 +53,16 @@ int main()
     Animation attendAnim = {0};
     Animation bulleAnim = {0};
     Animation tirAnim = {0};
-    tirAnim.offsetY=-72;
+    tirAnim.offsetY=-50;
+    Animation flecheAnim = {0};
+
     Animation* animations[] = {
         &decorAnim,
         &marcheAnim,
         &attendAnim,
         &bulleAnim,
-        &tirAnim
+        &tirAnim,
+        &flecheAnim
     };
 
     Objet decor = {0};
@@ -67,6 +70,16 @@ int main()
     Objet bulle1 = {0};
     Objet bulle2 = {0};
     Objet bulle3 = {0};
+    Objet fleche = {0};
+
+
+
+    decor.name = "decors";
+    warrior.name = "warrior";
+    bulle1.name = "bulle1";
+    bulle2.name = "bulle2";
+    bulle3.name = "bulle3";
+    fleche.name = "fleche";
 
     Objet* objects[] = {
         &decor,
@@ -74,6 +87,7 @@ int main()
         &bulle1,
         &bulle2,
         &bulle3,
+        &fleche,
     };
 
     decor.animation = &decorAnim;
@@ -81,6 +95,8 @@ int main()
     bulle1.animation = &bulleAnim;
     bulle2.animation = &bulleAnim;
     bulle3.animation = &bulleAnim;
+    fleche.animation = &flecheAnim;
+    fleche.hidden = true;
 
     Partie partie = {0};
 
@@ -94,6 +110,7 @@ int main()
     load_Anim(&attendAnim,7, "../SpritesAnimation/WarriorStatique/WarriorStat%d.bmp");
     load_Anim(&bulleAnim,1, "../SpritesAnimation/BulleNiv1.bmp");
     load_Anim(&tirAnim,1, "../SpritesAnimation/tirWarrior.bmp");
+    load_Anim(&flecheAnim,1, "../SpritesAnimation/fleche.bmp");
 
     BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
     clear_bitmap(page);
@@ -172,13 +189,22 @@ int main()
             warrior.animation = &attendAnim;
         }
         if (key[KEY_SPACE]) {
+            if (fleche.hidden) {
+                fleche.x=warrior.x+43;
+                fleche.y=warrior.y-43;
+                fleche.hidden = false;
+            }
+        }
 
+
+        if (key [KEY_UP]) {
             warrior.animation = &tirAnim;
         }
 
-        deplacement_Bulle(&bulle1);
-        deplacement_Bulle(&bulle2);
-        deplacement_Bulle(&bulle3);
+        for (int cpt = 0; cpt < ARRAY_COUNT(objects); cpt++) {
+            deplacement_Objet(objects[cpt]);
+        }
+
 
 
         for (int cpt = 0; cpt < ARRAY_COUNT(objects); cpt++) {

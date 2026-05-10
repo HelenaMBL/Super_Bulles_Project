@@ -13,13 +13,14 @@ typedef enum
 
 typedef struct
 {
+    const char* name;
     int x;
     int y;
     int vx;
     int vy;
     int radius;
 
-    bool active;
+    bool hidden;
     bool flip;
 
     ObjectType type;
@@ -28,7 +29,7 @@ typedef struct
 
 } Objet;
 
-void deplacement_Bulle(Objet *bulle);
+void deplacement_Objet(Objet *p);
 void draw_objectSprite(Objet *p, BITMAP* page);
 void init_bulle_big(Objet* bulle, Animation* anim, int x, int y);
 void split_bulle(Objet* big, Objet* small, Animation* smallAnim);
