@@ -7,6 +7,124 @@
 #include "constantes.h"
 #include "object.h"
 #include "allegro.h"
+int menu(BITMAP *page, Partie* partie) {
+    int i = 0;
+    int fin=1;
+    int erreur=0;
+    //Partie partie ={0};
+    Objet joueur={0};
+    int saisie_pseudo = 0;
+    partie->pseudo[0] = '\0';
+    int choix;
+
+    BITMAP *play = load_bitmap("../images/play_button_blue_24bit.bmp", NULL);
+
+    if (!play) {
+        allegro_message("Echec chargement bitmap '%s' [%s]", "../images/play_button_blue_24bit.bmp", allegro_error);
+        exit(EXIT_FAILURE);
+    }
+
+    while (fin == 1) {
+        // 1. saisie clavier (TOUJOURS)
+
+
+        if (keypressed()) {
+            int k = readkey();
+            char c = k & 0xFF;
+            int code = k >> 8;
+
+            // ENTER = toggle saisie
+            if (code == KEY_ENTER) {
+                saisie_pseudo = !saisie_pseudo;
+                choix = 1;
+            }
+            if (key[KEY_ESC]) {
+                fin = 0;
+            }
+            if (saisie_pseudo) {
+                if (saisie_pseudo && c == '\b' && i > 0) {
+                    i--;
+                    partie->pseudo[i] = '\0';
+                }
+                // caractères normaux
+                if (saisie_pseudo && i < 39 && c >= 32) {
+                    partie->pseudo[i++] = c;
+                    partie->pseudo[i] = '\0';
+                }
+            }
+
+            // flush buffer
+            while (keypressed())
+                readkey();
+        }
+
+
+        // 2. clic souris (validation)
+        if (mouse_b & 1 ) {
+
+            int couleur = getpixel(screen, mouse_x, mouse_y);
+            if (couleur == makecol(153, 153, 153))saisie_pseudo = !saisie_pseudo;
+
+            if (couleur == makecol(0, 0, 255) && saisie_pseudo==0 && partie->pseudo[0] != '\0') {
+                choix = 1;
+            }
+            if (couleur == makecol(0, 0, 255) && partie->pseudo[0] == '\0')erreur=1;
+            while(mouse_b & 1);
+        }
+
+        // 3. affichage
+        clear_bitmap(page);
+
+        // image du bouton
+        stretch_sprite(page, play, SCREEN_W/2 -100, SCREEN_H/2 -100, 200, 200);
+
+        // bouton cyan
+        rectfill(page,
+                 SCREEN_W/3 -30, SCREEN_H/4 -40,
+                 2*SCREEN_W/3 +30, SCREEN_H/4 +40,
+                 makecol(153,153,153));
+        circlefill(page,SCREEN_W/3 -30,SCREEN_H/4 ,40,makecol(153,153,153));
+        circlefill(page,2*SCREEN_W/3 +30,SCREEN_H/4 ,40,makecol(153,153,153));
+        if (saisie_pseudo==1) {
+            rectfill(page,
+                 SCREEN_W/3 -20, SCREEN_H/4 -30,
+                 2*SCREEN_W/3 +20, SCREEN_H/4 +30,
+                 makecol(171,171,171));
+            circlefill(page,SCREEN_W/3 -20,SCREEN_H/4 ,30,makecol(171,171,171));
+            circlefill(page,2*SCREEN_W/3 +20,SCREEN_H/4 ,30,makecol(171,171,171));
+        }
+
+        // pseudo
+        textout_ex(page, font,
+                   partie->pseudo,
+                   SCREEN_W/3 -30,  SCREEN_H/4  ,
+                   makecol(255,255,255),
+                   -1);
+        if (erreur)textout_ex(page, font,"rentrer un pseudo",SCREEN_W/2 -68,SCREEN_H-50,makecol(255,0,0),-1);
+
+        // affichage final
+        blit(page, screen, 0,0,0,0,SCREEN_W,SCREEN_H);
+
+        switch(choix){
+            case 1:
+                partie->temps=120;
+                partie->vie=3;
+                partie->niveau=1;
+                partie->score=0;
+                //return choix;
+                //Parties(&partie,&joueur);
+                return choix;
+                //choix=0;
+                //break;
+            case 2:
+                fin=0;
+               //allegro_exit();
+                break;
+
+        }
+    }
+    return choix;
+}
 
 #if 0
 void jouer(Partie* p, Objet*j){
@@ -509,5 +627,6 @@ if (p->niveau==3) {
     rest(3000);
 
 }
-
 #endif
+
+

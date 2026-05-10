@@ -45,7 +45,7 @@ void lire(Partie* p, Objet *joueur) {
     fclose(pf);
 }
 
-void Parties(Partie* partie, Objet* joueur){
+void Parties(Partie* partie, Objet* joueur) {
 
 
     partie->temps=120;

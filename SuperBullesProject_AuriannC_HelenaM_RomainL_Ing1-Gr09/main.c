@@ -4,6 +4,7 @@
 #include "object.h"
 #include "reglages.h"
 #include "constantes.h"
+#include "jeu.h"
 
 
 void initialisation_allegro() {
@@ -23,18 +24,36 @@ clock_t diffMilliseconds(clock_t end, clock_t start) {
     return (end - start) * 1000 / CLOCKS_PER_SEC;
 }
 
-
-int main()
-{
-    srand((unsigned int)time(NULL) ^ (unsigned int)clock());
-
+void jouerPartie(BITMAP *page);
+int main() {
     initialisation_allegro();
     install_mouse();
+    show_mouse(screen);
+
+    BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
+    clear_bitmap(page);
+
+    Partie partie = {0};
+    //Objet warrior = {0};
+    switch (menu(page, &partie)) {
+        case 1:
+            //Partie(&partie,&joueur);
+            jouerPartie(page);
+            //jouer();
+            break;
+    }
+    destroy_bitmap(page);
+    allegro_exit();
+    return 0;
+}
+
+void jouerPartie(BITMAP *page) {
+    srand((unsigned int)time(NULL) ^ (unsigned int)clock());
+
     char decorPath[1024];
     // Données géométriques de l'animation
     int dx,dy;
     int tx,ty;
-
 
     // Pour pouvoir avancer très lentement on avance moins souvent
     //  ( ajouter dx une fois tous les tmpdx, initialement à chaque fois )
@@ -71,8 +90,6 @@ int main()
     Objet bulle2 = {0};
     Objet bulle3 = {0};
     Objet fleche = {0};
-
-
 
     decor.name = "decors";
     warrior.name = "warrior";
@@ -112,8 +129,6 @@ int main()
     load_Anim(&tirAnim,1, "../SpritesAnimation/tirWarrior.bmp");
     load_Anim(&flecheAnim,1, "../SpritesAnimation/fleche.bmp");
 
-    BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
-    clear_bitmap(page);
 
     draw_objectSprite(&decor, page);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -169,10 +184,6 @@ int main()
             for (int cpt = 0; cpt < ARRAY_COUNT(animations); cpt++) {
                 increment_Anim(animations[cpt]);
             }
-            //increment_Anim(&decorAnim);
-            //increment_Anim(&marcheAnim);
-            //increment_Anim(&attendAnim);
-            //increment_Anim(&bulleAnim);
             lastClock = currentClock;
         }
 
@@ -195,8 +206,6 @@ int main()
                 fleche.hidden = false;
             }
         }
-
-
         if (key [KEY_UP]) {
             warrior.animation = &tirAnim;
         }
@@ -205,15 +214,9 @@ int main()
             deplacement_Objet(objects[cpt]);
         }
 
-
-
         for (int cpt = 0; cpt < ARRAY_COUNT(objects); cpt++) {
             draw_objectSprite(objects[cpt], page);
         }
-        //draw_objectSprite(&decor, page);
-        //draw_objectSprite(&warrior, page);
-        //draw_objectSprite(&bulle, page);
-
 
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
@@ -222,11 +225,8 @@ int main()
 
 
 
-    destroy_bitmap(page);
     for (int cpt = 0; cpt < ARRAY_COUNT(animations); cpt++) {
         destroy_bitmap(animations[cpt]->images[0]);
     }
-    allegro_exit();
-    return 0;
 }
 END_OF_MAIN()

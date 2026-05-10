@@ -7,6 +7,7 @@
 
 #include "partie.h"
 
+int menu(BITMAP *page, Partie* partie);
 void jouer(Partie* p, Objet*j);
 
 
