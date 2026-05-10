@@ -24,30 +24,7 @@ clock_t diffMilliseconds(clock_t end, clock_t start) {
     return (end - start) * 1000 / CLOCKS_PER_SEC;
 }
 
-void jouerPartie(BITMAP *page);
-int main() {
-    initialisation_allegro();
-    install_mouse();
-    show_mouse(screen);
-
-    BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
-    clear_bitmap(page);
-
-    Partie partie = {0};
-    //Objet warrior = {0};
-    switch (menu(page, &partie)) {
-        case 1:
-            //Partie(&partie,&joueur);
-            jouerPartie(page);
-            //jouer();
-            break;
-    }
-    destroy_bitmap(page);
-    allegro_exit();
-    return 0;
-}
-
-void jouerPartie(BITMAP *page) {
+void jouerPartie(BITMAP *page, Partie* partie) {
     srand((unsigned int)time(NULL) ^ (unsigned int)clock());
 
     char decorPath[1024];
@@ -115,11 +92,6 @@ void jouerPartie(BITMAP *page) {
     fleche.animation = &flecheAnim;
     fleche.hidden = true;
 
-    Partie partie = {0};
-
-    // La tempo générale (fonction rest) sera réglable
-    int tempoglobale=10;
-
     sprintf(decorPath, "../images/decorbis%s-24.bmp", (USE_FULLSCREEN) ? "1280x800" : "800x600");
 
     load_Anim(&decorAnim, 1, decorPath);
@@ -128,7 +100,6 @@ void jouerPartie(BITMAP *page) {
     load_Anim(&bulleAnim,1, "../SpritesAnimation/BulleNiv1.bmp");
     load_Anim(&tirAnim,1, "../SpritesAnimation/tirWarrior.bmp");
     load_Anim(&flecheAnim,1, "../SpritesAnimation/fleche.bmp");
-
 
     draw_objectSprite(&decor, page);
     blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -154,8 +125,8 @@ void jouerPartie(BITMAP *page) {
         currentClock = clock();
 
         blit(decorAnim.images[0],page,0,0,0,0,SCREEN_W,SCREEN_H);
-        affichageData(page,&partie); // ,&dx,&tmpdx,&tmpimg);
-        
+        affichageData(page,partie); // ,&dx,&tmpdx,&tmpimg);
+
         // incrémenter imgcourante une fois sur tmpimg
         if (tmpimg < 1) tmpimg = 1;
         if (tmpimg > 50) tmpimg = 50; // limite pour éviter blocage
@@ -217,16 +188,30 @@ void jouerPartie(BITMAP *page) {
         for (int cpt = 0; cpt < ARRAY_COUNT(objects); cpt++) {
             draw_objectSprite(objects[cpt], page);
         }
-
         blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
     }
-
-
-
-
     for (int cpt = 0; cpt < ARRAY_COUNT(animations); cpt++) {
         destroy_bitmap(animations[cpt]->images[0]);
     }
+}
+
+int main() {
+    initialisation_allegro();
+    install_mouse();
+    show_mouse(screen);
+
+    BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
+    clear_bitmap(page);
+
+    Partie partie = {0};
+    //Objet warrior = {0};
+    switch (menu(page, &partie)) {
+        case 1:
+            jouerPartie(page, &partie);
+            break;
+    }
+    destroy_bitmap(page);
+    allegro_exit();
+    return 0;
 }
 END_OF_MAIN()
