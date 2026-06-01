@@ -23,9 +23,9 @@ class evolutiondumouv:
         tk.Scale(fenetre,from_=-5, to= 5, resolution=0.1,label="Décalage (b)", orient="horizontal",variable=self.decalage,command=self.mettre_a_jour_courbe).pack()
 
         # graphique
-        self.figure, self.axes = plt.subplots()
+        self.figure, self.axes= plt.subplots() #conversion du graph matplot en widget tkinter
 
-        self.canvas = FigureCanvasTkAgg(self.figure, master=fenetre)
+        self.canvas= FigureCanvasTkAgg(self.figure, master=fenetre)
         self.canvas.get_tk_widget().pack()
 
         self.mettre_a_jour_courbe()

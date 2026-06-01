@@ -9,7 +9,7 @@ class evolutiondumouv:
 
     def __init__(self, fenetre):
 
-        self.fenetre = fenetre
+        self.fenetre =fenetre
         fenetre.attributes("-fullscreen", True)
         self.fenetre.title("Simulation RLC - Courant et tension")
 
@@ -27,21 +27,21 @@ class evolutiondumouv:
         ).pack()
 
         tk.Scale(
-            fenetre, from_=0.1, to=10, resolution=0.1,
+            fenetre, from_=0.1,to=10, resolution=0.1,
             label="Inductance L",
             variable=self.inductance,
             command=self.mettre_a_jour_courbe
         ).pack()
 
         tk.Scale(
-            fenetre, from_=0.1, to=10, resolution=0.1,
+            fenetre,from_=0.1,to=10, resolution=0.1,
             label="Capacité C",
             variable=self.capacite,
             command=self.mettre_a_jour_courbe
         ).pack()
 
         # label info
-        self.label = tk.Label(self.fenetre, text="")
+        self.label= tk.Label(self.fenetre, text="")
         self.label.pack()
 
         # graphique
@@ -51,8 +51,8 @@ class evolutiondumouv:
 
         self.mettre_a_jour_courbe()
 
-    #système différentiel RLC
-    def model(self, t, y):
+    #Eq différentiel RLC
+    def derive(self,t,y):
 
         i,v= y  # i=courant, v=di/dt
 
@@ -63,7 +63,7 @@ class evolutiondumouv:
         Ve =np.sin(t)  # tension d'entrée
 
         di_dt= v
-        dv_dt=(1 / L) * (Ve - R * v - i / C)
+        dv_dt=(1 /L) * (Ve-R *v-i/C)
 
         return [di_dt, dv_dt]
 
@@ -72,7 +72,7 @@ class evolutiondumouv:
         t_span=(0, 20)
         t=np.linspace(0, 20, 1000)
 
-        sol= solve_ivp(self.model, t_span, [0, 0], t_eval=t)
+        sol= solve_ivp(self.derive, t_span, [0, 0], t_eval=t)
 
         i= sol.y[0]
         Ve= np.sin(t)
@@ -87,7 +87,7 @@ class evolutiondumouv:
         self.ax.plot(t, Ve, label="Ve(t)", color="red")
         self.ax.plot(t, i, label="i(t)", color="blue")
 
-        self.ax.set_title("Circuit RLC - simulation dynamique\n" r" $L\frac{d^2 i}{dt^2} + R\frac{di}{dt} + \frac{1}{C}i = V_e(t)$")
+        self.ax.set_title(r" Equation :   $L\frac{d^2 i}{dt^2} + R\frac{di}{dt} + \frac{1}{C}i = V_e(t)$" " \n Circuit RLC" )
         self.ax.legend()
         self.ax.grid(True)
 
@@ -95,6 +95,6 @@ class evolutiondumouv:
 
 
 # lancement
-fenetre = tk.Tk()
-app = evolutiondumouv(fenetre)
+fenetre= tk.Tk()
+app= evolutiondumouv(fenetre)
 fenetre.mainloop()
